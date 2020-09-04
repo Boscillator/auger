@@ -11,43 +11,49 @@ TEST_CASE("Sanity Check", "[sanity]") {
 }
 
 
-SCENARIO("A circular buffer can have be written and read from in arbitrary sizes") {
-    GIVEN("A circular buffer") {
-        CircularBuffer<int, 64, 8, 16> buffer;
-
-        WHEN("16 data points are written") {
-            int data[] = {1,2,3,4,5,6,7,8,7,6,5,4,3,2,1,0};
-            memcpy(buffer.write().data(), data, sizeof(int) * 16);
-            THEN("The size should update") {
-                REQUIRE(buffer.size() == 16);
+SCENARIO("A circular buffer can have be written to and read from") {
+    GIVEN("A blank circular buffer") {
+        CircularBuffer<float, 64> buffer;
+        WHEN("you write to it") {
+            float block[] = {1.0, 2.0, 3.0, 4.0};
+            buffer.write(block);
+            THEN("it's size increases") {
+                REQUIRE(buffer.size() == 4);
             }
         }
     }
 
     GIVEN("A circular buffer with some data") {
-        CircularBuffer<int, 64, 8, 16> buffer;
-        int data[] = {1,2,3,4,5,6,7,8,7,6,5,4,3,2,1,0};
-        memcpy(buffer.write().data(), data, sizeof(int) * 16);
+        CircularBuffer<float, 32> buffer;
+        float block[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+        buffer.write(block);
 
-        WHEN("8 data points are read") {
-            std::span<int, 8> result = buffer.read();
-            THEN("The values should be correct") {
-                REQUIRE(result[0] == 1);
-                REQUIRE(result[1] == 2);
-                REQUIRE(result[2] == 3);
+        WHEN("you read from it") {
+            float output[4];
+            buffer.read(output);
+            THEN("The output is correct") {
+                REQUIRE(output[0] == 1.0);
+                REQUIRE(output[1] == 2.0);
+                REQUIRE(output[2] == 3.0);
+                REQUIRE(output[3] == 4.0);
             }
             THEN("The size is updated") {
-                REQUIRE(buffer.size() == 8);
+                REQUIRE(buffer.size() == 4);
             }
         }
 
-        WHEN("the data is read so as to overrun the end of the buffer") {
-            for(int i = 0; i < 64/8; i++) {
-                buffer.read();
+        WHEN("you read enough data to loop around") {
+            float temp[4];
+            for(int i = 0; i < 32/4; i++) {
+                buffer.read(temp);
             }
-            THEN("the read pointer resets to the beginning of the buffer") {
-                std::span<int, 8> result = buffer.read();
-                REQUIRE(result[0] == 1);
+            THEN("It loops around") {
+                float output[4];
+                buffer.read(output);
+                REQUIRE(output[0] == 1.0);
+                REQUIRE(output[1] == 2.0);
+                REQUIRE(output[2] == 3.0);
+                REQUIRE(output[3] == 4.0);
             }
         }
     }
