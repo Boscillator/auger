@@ -72,7 +72,8 @@ juce_add_plugin(AugerPlugin
 
 target_sources(AugerPlugin PRIVATE
         src/PluginEditor.cpp
-        src/PluginProcessor.cpp)
+        src/PluginProcessor.cpp
+        src/CircularBuffer.h)
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use
@@ -111,5 +112,5 @@ target_link_libraries(AugerPlugin PRIVATE
 set_property(TARGET AugerPlugin PROPERTY CXX_STANDARD 20)
 
 # Unit Test!
-add_executable(unit_tests test/tests.cpp src/CircularBuffer.h)
+add_executable(unit_tests test/tests.cpp src/CircularBuffer.h src/BlockSizeAdapter.cpp src/BlockSizeAdapter.h)
 set_property(TARGET unit_tests PROPERTY CXX_STANDARD 20)

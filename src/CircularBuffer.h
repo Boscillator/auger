@@ -17,12 +17,15 @@ class CircularBuffer {
 public:
     CircularBuffer();
     void read(std::span<T> block);
+    void read(T* dst, size_t n) { read(std::span<T>(dst, n)); };
     void write(std::span<T> block);
+    void write(T* src, size_t n) { write(std::span<T>(src, n)); };
     int size();
 
 private:
     std::array<T, BufferSize> _buffer;
-    size_t _readPtr, _writePtr;
+    size_t _readPtr = 0;
+    size_t _writePtr = 0;
 };
 
 template<typename T, size_t BufferSize>

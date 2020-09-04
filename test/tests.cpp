@@ -5,6 +5,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "../src/CircularBuffer.h"
+#include "../src/BlockSizeAdapter.h"
 
 TEST_CASE("Sanity Check", "[sanity]") {
     REQUIRE(1 == 1);
@@ -54,6 +55,38 @@ SCENARIO("A circular buffer can have be written to and read from") {
                 REQUIRE(output[1] == 2.0);
                 REQUIRE(output[2] == 3.0);
                 REQUIRE(output[3] == 4.0);
+            }
+        }
+    }
+}
+
+class TestBlockProcessor : public BlockSizeAdapter::AdapterProcessor {
+public:
+    int chunksProcessed = 0;
+    void processChunk(std::span<float> chunk) override {
+        std::fill(chunk.begin(), chunk.end(), 1.0f);
+        chunksProcessed++;
+    }
+
+};
+
+SCENARIO("BlockSizeAdapter can process data as required") {
+    GIVEN("A BlockSizeAdapter with a TestBlockProcessor and size 16 chunks") {
+        TestBlockProcessor p;
+        BlockSizeAdapter adapter(&p, 16);
+
+        WHEN("A group of chunks is written") {
+            float chunk[] = {0.0, 0.0, 0.0, 0.0};
+            for(int i = 0; i < 4; i++) {
+                adapter.process(chunk);
+            }
+//            THEN("processing occurred") {
+//                REQUIRE(p.chunksProcessed == 1);
+//            }
+            THEN("the result can be read") {
+                // Read the next available chunk into `chunk`
+                adapter.process(chunk);
+                REQUIRE(chunk[0] == 1.0f);
             }
         }
     }
