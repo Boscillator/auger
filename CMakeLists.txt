@@ -9,6 +9,7 @@
 # information can be found in the CMake docs.
 
 cmake_minimum_required(VERSION 3.15)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # build opus
 add_subdirectory(opus)
@@ -107,3 +108,8 @@ target_link_libraries(AugerPlugin PRIVATE
     juce::juce_audio_utils
     opus)
 
+set_property(TARGET AugerPlugin PROPERTY CXX_STANDARD 20)
+
+# Unit Test!
+add_executable(unit_tests test/tests.cpp src/CircularBuffer.h)
+set_property(TARGET unit_tests PROPERTY CXX_STANDARD 20)
