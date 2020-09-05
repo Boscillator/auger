@@ -6,6 +6,7 @@
 #include "catch.hpp"
 #include "../src/CircularBuffer.h"
 #include "../src/BlockSizeAdapter.h"
+#include "../src/utilities.h"
 
 TEST_CASE("Sanity Check", "[sanity]") {
     REQUIRE(1 == 1);
@@ -88,6 +89,51 @@ SCENARIO("BlockSizeAdapter can process data as required") {
                 adapter.process(chunk);
                 REQUIRE(chunk[0] == 1.0f);
             }
+        }
+    }
+}
+
+TEST_CASE("interlace()", "[utilities]") {
+    SECTION("interlace samples correctly") {
+        float left[] = {1.0f, 1.0f, 1.0f, 1.0f};
+        float right[] = {2.0f, 2.0f, 2.0f, 2.0f};
+        float result[8];
+        interlace(4, left, right, result);
+        for(int i = 0; i < 8; i += 2) {
+            REQUIRE(result[i] == 1.0f);
+            REQUIRE(result[i+1] == 2.0f);
+        }
+    }
+    SECTION("deinterlace() works correctly") {
+        float left[4];
+        float right[4];
+        float data[] = {1.0, 2.0, 1.0, 2.0, 1.0, 2.0, 1.0, 2.0};
+        deinterlace(4, left, right, data);
+        for(int i = 0; i < 4; i++) {
+            REQUIRE(left[i] == 1.0f);
+            REQUIRE(right[i] == 2.0f);
+        }
+    }
+    SECTION("interlace() followed by deinterlace() returns original result") {
+
+        float left[] = {1.0f, 1.0f, 1.0f, 1.0f};
+        float right[] = {2.0f, 2.0f, 2.0f, 2.0f};
+        float result[8];
+
+        // Interlace
+        interlace(4, left, right, result);
+
+        // Clear buffers so they can be re-used
+        std::fill(left, left+4, 0.0f);
+        std::fill(right, right+4, 0.0f);
+
+        // Deinterlace
+        deinterlace(4, left, right, result);
+
+        // assert
+        for(int i = 0; i < 4; i++) {
+            REQUIRE(left[i] == 1.0f);
+            REQUIRE(right[i] == 2.0f);
         }
     }
 }
