@@ -78,7 +78,17 @@ void AudioPluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     juce::ignoreUnused(samplesPerBlock);
+
+    // Set the interlace buffer to the correct size
     _interlacedBuffer.resize(2*samplesPerBlock);
+
+    // Create the OPUS encoder
+    int err;
+    _encoder = opus_encoder_create(48000, 2, OPUS_APPLICATION_VOIP, &err);
+    _decoder = opus_decoder_create(48000, 2, &err);
+
+    // Set bitrate TODO: replace with parameters
+    opus_encoder_ctl(_encoder, OPUS_SET_BITRATE(8000));
 
 }
 
@@ -143,7 +153,9 @@ void AudioPluginAudioProcessor::setStateInformation(const void* data, int sizeIn
 }
 
 void AudioPluginAudioProcessor::processChunk(std::span<float> chunk) {
-
+    unsigned char data[PACKET_SIZE];
+    size_t bytes = opus_encode_float(_encoder, chunk.data(), chunk.size()/2, data, PACKET_SIZE);
+    opus_decode_float(_decoder, data, bytes, chunk.data(), chunk.size()/2, 0);
 }
 
 //==============================================================================

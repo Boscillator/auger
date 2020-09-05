@@ -1,7 +1,9 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <opus.h>
 #include "BlockSizeAdapter.h"
+#define PACKET_SIZE 512
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public juce::AudioProcessor, public BlockSizeAdapter::AdapterProcessor
@@ -50,6 +52,8 @@ private:
 
     BlockSizeAdapter _blockSizeAdapter;
     std::vector<float> _interlacedBuffer;
+    OpusEncoder* _encoder;
+    OpusDecoder* _decoder;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
