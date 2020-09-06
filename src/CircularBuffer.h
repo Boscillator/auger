@@ -16,10 +16,37 @@ class CircularBuffer {
 
 public:
     CircularBuffer();
+
+    /**
+     * Read `block.size()` samples from the buffer into `block`. Mutating block may mutate the contents of the buffer
+     * @param block A place in memory to read to
+     */
     void read(std::span<T> block);
+
+    /**
+     * Read `n` samples form the buffer
+     * @param dst The location to write data to. At least `n*sizeof(T)` bytes in size.
+     * @param n The number of samples to read
+     */
     void read(T* dst, size_t n) { read(std::span<T>(dst, n)); };
+
+    /**
+     * Write samples from `block` into the buffer
+     * @param block Location to write data from
+     */
     void write(std::span<T> block);
+
+    /**
+     * Write n samples to the buffer
+     * @param src Location to start reading from. Must be at least `n*sizeof(T)` bytes long
+     * @param n Number of samples to write
+     */
     void write(T* src, size_t n) { write(std::span<T>(src, n)); };
+
+    /**
+     * Get the size difference between the read head and write head
+     * @return `(writePosition - readPosition) % BufferSize`
+     */
     int size();
 
 private:
