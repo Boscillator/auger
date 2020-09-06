@@ -6,7 +6,7 @@
 #define PACKET_SIZE 512
 
 //==============================================================================
-class AudioPluginAudioProcessor  : public juce::AudioProcessor, public BlockSizeAdapter::AdapterProcessor
+class AudioPluginAudioProcessor  : public juce::AudioProcessor, public BlockSizeAdapter::AdapterProcessor, public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     //==============================================================================
@@ -44,16 +44,20 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    //===============================================================================
+    //==============================================================================
     void processChunk(std::span<float> chunk) override;
+    void parameterChanged(const juce::String& parameterID, float newValue) override;
 
 private:
-    // Processors
+    // Processors ==================================================================
 
     BlockSizeAdapter _blockSizeAdapter;
     std::vector<float> _interlacedBuffer;
-    OpusEncoder* _encoder;
-    OpusDecoder* _decoder;
+    OpusEncoder* _encoder = nullptr;
+    OpusDecoder* _decoder = nullptr;
+
+    // Parameters ==================================================================
+    juce::AudioProcessorValueTreeState _parameters;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)

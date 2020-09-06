@@ -12,7 +12,12 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                                  .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
 ),
-          _blockSizeAdapter(this, 2 * 480) {
+          _blockSizeAdapter(this, 2 * 480),
+          _parameters(*this, nullptr, juce::Identifier("AugerPlugin"),
+                      {
+                              std::make_unique<juce::AudioParameterInt>("bitrate", "BitRate", 8000, 40000, 16000)
+                      }) {
+    _parameters.addParameterListener("bitrate", this);
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
@@ -80,7 +85,7 @@ void AudioPluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
     juce::ignoreUnused(samplesPerBlock);
 
     // Set the interlace buffer to the correct size
-    _interlacedBuffer.resize(2*samplesPerBlock);
+    _interlacedBuffer.resize(2 * samplesPerBlock);
 
     // Create the OPUS encoder
     int err;
@@ -88,7 +93,9 @@ void AudioPluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
     _decoder = opus_decoder_create(48000, 2, &err);
 
     // Set bitrate TODO: replace with parameters
-    opus_encoder_ctl(_encoder, OPUS_SET_BITRATE(8000));
+    int bitrate = (int)*_parameters.getRawParameterValue("bitrate");
+    DBG(bitrate);
+    opus_encoder_ctl(_encoder, OPUS_SET_BITRATE(bitrate));
 
 }
 
@@ -135,7 +142,8 @@ bool AudioPluginAudioProcessor::hasEditor() const {
 }
 
 juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor() {
-    return new AudioPluginAudioProcessorEditor(*this);
+//    return new AudioPluginAudioProcessorEditor(*this);
+    return new juce::GenericAudioProcessorEditor(this);
 }
 
 //==============================================================================
@@ -143,19 +151,33 @@ void AudioPluginAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused(destData);
+    auto state = _parameters.copyState();
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void AudioPluginAudioProcessor::setStateInformation(const void* data, int sizeInBytes) {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
-    juce::ignoreUnused(data, sizeInBytes);
+    std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName(_parameters.state.getType()))
+            _parameters.replaceState(juce::ValueTree::fromXml(*xmlState));
 }
 
 void AudioPluginAudioProcessor::processChunk(std::span<float> chunk) {
+    // Encode and decode packet
     unsigned char data[PACKET_SIZE];
-    size_t bytes = opus_encode_float(_encoder, chunk.data(), chunk.size()/2, data, PACKET_SIZE);
-    opus_decode_float(_decoder, data, bytes, chunk.data(), chunk.size()/2, 0);
+    size_t bytes = opus_encode_float(_encoder, chunk.data(), chunk.size() / 2, data, PACKET_SIZE);
+    opus_decode_float(_decoder, data, bytes, chunk.data(), chunk.size() / 2, 0);
+}
+
+void AudioPluginAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue) {
+    if(_encoder == nullptr) return;
+    if(parameterID == "bitrate") {
+        opus_encoder_ctl(_encoder, OPUS_SET_BITRATE((int) newValue));
+    }
 }
 
 //==============================================================================
