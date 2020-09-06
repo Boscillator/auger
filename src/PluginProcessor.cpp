@@ -142,8 +142,8 @@ bool AudioPluginAudioProcessor::hasEditor() const {
 }
 
 juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor() {
-//    return new AudioPluginAudioProcessorEditor(*this);
-    return new juce::GenericAudioProcessorEditor(this);
+    return new AudioPluginAudioProcessorEditor(*this);
+//    return new juce::GenericAudioProcessorEditor(this);
 }
 
 //==============================================================================
@@ -178,6 +178,10 @@ void AudioPluginAudioProcessor::parameterChanged(const juce::String& parameterID
     if(parameterID == "bitrate") {
         opus_encoder_ctl(_encoder, OPUS_SET_BITRATE((int) newValue));
     }
+}
+
+void AudioPluginAudioProcessor::attachSlider(const juce::String& parameterId, juce::Slider& slider) {
+    _sliderAttachments.push_back(std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(_parameters, parameterId, slider));
 }
 
 //==============================================================================

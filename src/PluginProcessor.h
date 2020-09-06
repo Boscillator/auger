@@ -48,6 +48,9 @@ public:
     void processChunk(std::span<float> chunk) override;
     void parameterChanged(const juce::String& parameterID, float newValue) override;
 
+    //==============================================================================
+    void attachSlider(const juce::String& parameterId, juce::Slider& slider);
+
 private:
     // Processors ==================================================================
 
@@ -58,6 +61,7 @@ private:
 
     // Parameters ==================================================================
     juce::AudioProcessorValueTreeState _parameters;
+    std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> _sliderAttachments;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
