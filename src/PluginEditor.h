@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PluginProcessor.h"
+#include "Win95LookAndFeel.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Slider::Listener
@@ -27,6 +28,7 @@ private:
     void sliderValueChanged(juce::Slider* slider) override;
 
     //==============================================================================
+    Win95LookAndFeel _lookAndFeel;
     juce::Colour _colorLightBlue = juce::Colour::fromRGB(0,128, 129);
     juce::Colour _colorLightGray = juce::Colour::fromRGB(0xDB, 0xDB, 0xDB);
     juce::Colour _colorBlack = juce::Colour::fromRGB(0,0,0);

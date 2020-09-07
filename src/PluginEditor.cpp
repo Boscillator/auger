@@ -51,11 +51,11 @@ void AudioPluginAudioProcessorEditor::drawWin95Window(juce::Graphics& g) const {
 
 void AudioPluginAudioProcessorEditor::resized()
 {
-    bitrateSlider.setBounds(147, 141, 305, 20);
+    bitrateSlider.setBounds(147, 141, 305, 40);
 }
 
 void AudioPluginAudioProcessorEditor::configureLookAndFeel() {
-    getLookAndFeel().setColour(juce::ResizableWindow::backgroundColourId, _colorLightBlue);
+    setLookAndFeel(&_lookAndFeel);
 }
 
 void AudioPluginAudioProcessorEditor::addComponents() {

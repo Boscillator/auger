@@ -77,7 +77,9 @@ target_sources(AugerPlugin PRIVATE
         src/BlockSizeAdapter.h
         src/BlockSizeAdapter.cpp
         src/utilities.cpp
-        src/utilities.h)
+        src/utilities.h
+        src/Win95LookAndFeel.cpp
+        src/Win95LookAndFeel.h)
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use
