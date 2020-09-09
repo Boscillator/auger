@@ -18,6 +18,9 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
 {
+    processorRef.unattachAllSliders();
+    bitrateSlider.removeListener(this);
+    setLookAndFeel(nullptr);
 }
 
 //==============================================================================

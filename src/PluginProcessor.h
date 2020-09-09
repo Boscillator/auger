@@ -50,6 +50,7 @@ public:
 
     //==============================================================================
     void attachSlider(const juce::String& parameterId, juce::Slider& slider);
+    void unattachAllSliders();
 
 private:
     // Processors ==================================================================

@@ -21,6 +21,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
+    unattachAllSliders();
 }
 
 //==============================================================================
@@ -180,8 +181,13 @@ void AudioPluginAudioProcessor::parameterChanged(const juce::String& parameterID
     }
 }
 
+//==============================================================================
 void AudioPluginAudioProcessor::attachSlider(const juce::String& parameterId, juce::Slider& slider) {
     _sliderAttachments.push_back(std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(_parameters, parameterId, slider));
+}
+
+void AudioPluginAudioProcessor::unattachAllSliders() {
+    _sliderAttachments.clear();
 }
 
 //==============================================================================
