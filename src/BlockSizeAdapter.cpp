@@ -19,7 +19,7 @@ void BlockSizeAdapter::setChunkSize(size_t chunkSize) {
 
 void BlockSizeAdapter::process(std::span<float> block) {
     _preBuffer.write(block);
-    if(_preBuffer.size() >= _chunkSize) {
+    while(_preBuffer.size() > _chunkSize) {
         std::vector<float> chunk;
         chunk.resize(_chunkSize);
         _preBuffer.read(chunk);
