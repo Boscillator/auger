@@ -3,7 +3,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <opus.h>
 #include "BlockSizeAdapter.h"
-#define PACKET_SIZE 512
+#define PACKET_SIZE 1024
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public juce::AudioProcessor, public BlockSizeAdapter::AdapterProcessor, public juce::AudioProcessorValueTreeState::Listener

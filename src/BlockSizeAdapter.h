@@ -55,8 +55,8 @@ public:
 private:
     AdapterProcessor* _processor;
     size_t _chunkSize;
-    CircularBuffer<float, 8192> _preBuffer;
-    CircularBuffer<float, 8192> _postBuffer;
+    CircularBuffer<float, 2*8192> _preBuffer;
+    CircularBuffer<float, 2*8192> _postBuffer;
     bool _processed = false;
 };
 

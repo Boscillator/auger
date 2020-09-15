@@ -62,17 +62,21 @@ CircularBuffer<T, BufferSize>::CircularBuffer() {
 
 template<typename T, size_t BufferSize>
 void CircularBuffer<T, BufferSize>::read(std::span<T> block) {
-    for(size_t i = 0; i < block.size(); i++) {
-        block[i] = _buffer[ (_readPtr + i) & _wrap];
-    }
+    size_t first_read = std::min(BufferSize - _readPtr, block.size());
+    size_t second_read = block.size() - first_read;
+    memcpy(block.data(), _buffer.data() + _readPtr, first_read * sizeof(T));
+    memcpy(block.data() + first_read, _buffer.data(), second_read * sizeof(T));
     _readPtr = (_readPtr + block.size()) & _wrap;
 }
 
 template<typename T, size_t BufferSize>
 void CircularBuffer<T, BufferSize>::write(std::span<T> block) {
-    for(size_t i = 0; i < block.size(); i++) {
-        _buffer[(_writePtr + i) & _wrap] = block[i];
-    }
+    size_t rpc = _readPtr;
+    size_t wpc = _writePtr;
+    size_t first_read = std::min(BufferSize - _writePtr, block.size());
+    size_t second_read = block.size() - first_read;
+    memcpy(_buffer.data() + _writePtr, block.data(), first_read * sizeof(T));
+    memcpy(_buffer.data(), block.data() + first_read, second_read * sizeof(T));
     _writePtr = (_writePtr + block.size()) & _wrap;
 }
 

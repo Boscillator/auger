@@ -23,6 +23,32 @@ SCENARIO("A circular buffer can have be written to and read from") {
                 REQUIRE(buffer.size() == 4);
             }
         }
+
+        WHEN("you perform a write along a boundary") {
+            float block1[60];
+            std::fill(block1, block1 + 60, 1.0f);
+            float block2[8];
+            std::fill(block2, block2 + 8, 2.0f);
+
+            buffer.write(block1);
+            buffer.write(block2);
+            THEN("it has the correct size") {
+                REQUIRE(buffer.size() == 4);
+            }
+            THEN("the correct data is read") {
+                float result[4] = {-1.0};
+                buffer.read(result);
+                REQUIRE(result[0] == 2.0f);
+                REQUIRE(result[1] == 2.0f);
+                REQUIRE(result[2] == 2.0f);
+                REQUIRE(result[3] == 2.0f);
+
+                float result2[60];
+                buffer.read(result2);
+                REQUIRE(result2[59 - 4] == 1.0f);
+                REQUIRE(result2[59] == 2.0f);
+            }
+        }
     }
 
     GIVEN("A circular buffer with some data") {
@@ -58,6 +84,27 @@ SCENARIO("A circular buffer can have be written to and read from") {
                 REQUIRE(output[3] == 4.0);
             }
         }
+
+        WHEN("you read across a boundary") {
+            float temp[4];
+            for(int i = 0; i < 31/4; i++) {
+                buffer.read(temp);
+            }
+
+            THEN("The read contains data on both sizes") {
+                float output[8];
+                buffer.read(output);
+                REQUIRE(output[0] == 0.0);
+                REQUIRE(output[1] == 0.0);
+                REQUIRE(output[2] == 0.0);
+                REQUIRE(output[3] == 0.0);
+                REQUIRE(output[4] == 1.0);
+                REQUIRE(output[5] == 2.0);
+                REQUIRE(output[6] == 3.0);
+                REQUIRE(output[7] == 4.0);
+            }
+        }
+
     }
 }
 
