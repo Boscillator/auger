@@ -50,6 +50,11 @@ public:
     void write(T* src, size_t n) { write(std::span<T>(src, n)); };
 
     /**
+     * Move the write pointer forward N samples, adding a delay.
+     */
+    void forward(size_t n);
+
+    /**
      * Get the size difference between the read head and write head
      * @return `(writePosition - readPosition) % BufferSize`
      */
@@ -68,14 +73,6 @@ CircularBuffer<T, BufferSize>::CircularBuffer() {
 
 template<typename T, size_t BufferSize>
 void CircularBuffer<T, BufferSize>::read(std::span<T> block) {
-
-#ifdef AUGER_DEBUG
-    if (block.size() > size()) {
-        std::cerr << "[ERR] " << __FILE__ << ":" << __LINE__ << "Read buffer overflow <this=" << (void*) this
-                  << " _readPtr=" << _readPtr << " _writePtr=" << _writePtr << " size()=" << size() << " block_size=" << block.size() << ">" << std::endl;
-    }
-#endif
-
     size_t first_read = std::min(BufferSize - _readPtr, block.size());
     size_t second_read = block.size() - first_read;
     memcpy(block.data(), _buffer.data() + _readPtr, first_read * sizeof(T));
@@ -96,7 +93,12 @@ void CircularBuffer<T, BufferSize>::write(std::span<T> block) {
 
 template<typename T, size_t BufferSize>
 int CircularBuffer<T, BufferSize>::size() {
-    return (_writePtr - _readPtr) % _wrap;
+    return (_writePtr - _readPtr) & _wrap;
+}
+
+template<typename T, size_t BufferSize>
+void CircularBuffer<T, BufferSize>::forward(size_t n) {
+    _writePtr = (_writePtr + n) & _wrap;
 }
 
 

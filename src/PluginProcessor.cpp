@@ -89,7 +89,6 @@ void AudioPluginAudioProcessor::changeProgramName(int index, const juce::String&
 void AudioPluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    juce::ignoreUnused(samplesPerBlock);
 
     // Set the interlace buffer to the correct size
     _interlacedBuffer.resize(2 * samplesPerBlock);
@@ -101,7 +100,6 @@ void AudioPluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
 
     // Set bitrate TODO: replace with parameters
     int bitrate = (int)*_parameters.getRawParameterValue("bitrate");
-    DBG(bitrate);
     opus_encoder_ctl(_encoder, OPUS_SET_BITRATE(bitrate));
 
 }

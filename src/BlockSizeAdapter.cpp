@@ -20,6 +20,7 @@ size_t BlockSizeAdapter::getChunkSize() const {
 
 void BlockSizeAdapter::setChunkSize(size_t chunkSize) {
     _chunkBuffer.resize(chunkSize);
+    _postBuffer.forward(chunkSize);
     _chunkSize = chunkSize;
 }
 
