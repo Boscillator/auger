@@ -7,6 +7,16 @@
 
 #include <vector>
 
+#ifdef AUGER_DEBUG
+#include <iostream>
+#include <chrono>
+#define DBG_LOG(level) std::cerr << "[" << level "] " << __FILE__ << ":" << __LINE__ << " "
+#define DBG_ERR() DBG_LOG("ERROR")
+#define DBG_INFO() DBG_LOG("INFO")
+#define DBG_PROF() DBG_LOG("PROF")
+#endif
+
+
 /**
  * Convert from two separate stereo buffers to a single interlaced buffer.
  * e.g.
@@ -32,6 +42,7 @@ void interlace(size_t n, const float* left, const float* right, float* dst);
  * @param src Location of the interlaced buffer. Must be `2*n*sizeof(float)` bytes long.
  */
 void deinterlace(size_t n, float* left, float* right, const float* src);
+
 
 
 #endif //AUGER_PLUGIN_UTILITIES_H

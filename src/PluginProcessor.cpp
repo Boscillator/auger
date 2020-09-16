@@ -1,3 +1,9 @@
+#ifdef AUGER_DEBUG
+#include <chrono>
+#endif
+
+#include <thread>
+
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "utilities.h"
@@ -143,8 +149,8 @@ bool AudioPluginAudioProcessor::hasEditor() const {
 }
 
 juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor() {
-//    return new AudioPluginAudioProcessorEditor(*this);
-    return new juce::GenericAudioProcessorEditor(this);
+    return new AudioPluginAudioProcessorEditor(*this);
+//    return new juce::GenericAudioProcessorEditor(this);
 }
 
 //==============================================================================
@@ -172,6 +178,8 @@ void AudioPluginAudioProcessor::processChunk(std::span<float> chunk) {
     unsigned char data[PACKET_SIZE];
     size_t bytes = opus_encode_float(_encoder, chunk.data(), chunk.size() / 2, data, PACKET_SIZE);
     opus_decode_float(_decoder, data, bytes, chunk.data(), chunk.size() / 2, 0);
+
+//    std::this_thread::sleep_for(std::chrono::microseconds(100));
 }
 
 void AudioPluginAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue) {

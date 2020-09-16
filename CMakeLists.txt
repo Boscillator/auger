@@ -120,3 +120,9 @@ set_property(TARGET AugerPlugin PROPERTY CXX_STANDARD 20)
 # Unit Test!
 add_executable(unit_tests test/tests.cpp src/CircularBuffer.h src/BlockSizeAdapter.cpp src/BlockSizeAdapter.h src/utilities.cpp src/utilities.h)
 set_property(TARGET unit_tests PROPERTY CXX_STANDARD 20)
+
+# Enable debug features
+if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    message("DEBUG features enabled")
+    add_compile_definitions(AUGER_DEBUG)
+endif()

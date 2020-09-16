@@ -3,7 +3,10 @@
 //
 
 #include <vector>
-#include <iostream>
+#ifdef AUGER_DEBUG
+#include <chrono>
+#endif
+#include "utilities.h"
 #include "BlockSizeAdapter.h"
 
 BlockSizeAdapter::BlockSizeAdapter(BlockSizeAdapter::AdapterProcessor* processor, size_t chunkSize) : _processor(
@@ -23,7 +26,9 @@ void BlockSizeAdapter::process(std::span<float> block) {
         std::vector<float> chunk;
         chunk.resize(_chunkSize);
         _preBuffer.read(chunk);
+
         _processor->processChunk(chunk);
+
         _postBuffer.write(chunk);
         _processed = true;
     }

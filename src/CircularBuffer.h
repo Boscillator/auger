@@ -8,6 +8,12 @@
 #include <array>
 #include <span>
 
+#ifdef AUGER_DEBUG
+
+#include <iostream>
+
+#endif
+
 template<typename T, size_t BufferSize>
 class CircularBuffer {
 
@@ -62,6 +68,14 @@ CircularBuffer<T, BufferSize>::CircularBuffer() {
 
 template<typename T, size_t BufferSize>
 void CircularBuffer<T, BufferSize>::read(std::span<T> block) {
+
+#ifdef AUGER_DEBUG
+    if (block.size() > size()) {
+        std::cerr << "[ERR] " << __FILE__ << ":" << __LINE__ << "Read buffer overflow <this=" << (void*) this
+                  << " _readPtr=" << _readPtr << " _writePtr=" << _writePtr << " size()=" << size() << " block_size=" << block.size() << ">" << std::endl;
+    }
+#endif
+
     size_t first_read = std::min(BufferSize - _readPtr, block.size());
     size_t second_read = block.size() - first_read;
     memcpy(block.data(), _buffer.data() + _readPtr, first_read * sizeof(T));
@@ -82,7 +96,7 @@ void CircularBuffer<T, BufferSize>::write(std::span<T> block) {
 
 template<typename T, size_t BufferSize>
 int CircularBuffer<T, BufferSize>::size() {
-    return (_writePtr - _readPtr) % BufferSize;
+    return (_writePtr - _readPtr) % _wrap;
 }
 
 
