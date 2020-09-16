@@ -57,6 +57,7 @@ private:
     size_t _chunkSize;
     CircularBuffer<float, 2*8192> _preBuffer;
     CircularBuffer<float, 2*8192> _postBuffer;
+    std::vector<float> _chunkBuffer;
     bool _processed = false;
 };
 
