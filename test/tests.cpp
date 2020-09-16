@@ -125,12 +125,9 @@ SCENARIO("BlockSizeAdapter can process data as required") {
 
         WHEN("A group of chunks is written") {
             float chunk[] = {0.0, 0.0, 0.0, 0.0};
-            for(int i = 0; i < 4; i++) {
+            for(int i = 0; i < 8; i++) {
                 adapter.process(chunk);
             }
-//            THEN("processing occurred") {
-//                REQUIRE(p.chunksProcessed == 1);
-//            }
             THEN("the result can be read") {
                 // Read the next available chunk into `chunk`
                 adapter.process(chunk);
