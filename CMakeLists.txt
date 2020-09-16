@@ -18,7 +18,7 @@ add_subdirectory(opus)
 # `project()` command. `project()` sets up some helpful variables that describe source/binary
 # directories, and the current project version. This is a standard CMake command.
 
-project(AUGER_PLUGIN VERSION 0.0.1)
+project(AUGER_PLUGIN VERSION 0.0.2)
 
 # If you've installed JUCE somehow (via a package manager, or directly using the CMake install
 # target), you'll need to tell this project that it depends on the installed copy of JUCE. If you've
@@ -51,7 +51,7 @@ juce_add_plugin(AugerPlugin
     # NEEDS_MIDI_OUTPUT TRUE/FALSE              # Does the plugin need midi output?
     # IS_MIDI_EFFECT TRUE/FALSE                 # Is this plugin a MIDI effect?
     # EDITOR_WANTS_KEYBOARD_FOCUS TRUE/FALSE    # Does the editor need keyboard focus?
-    # COPY_PLUGIN_AFTER_BUILD TRUE/FALSE        # Should the plugin be installed to a default location after building?
+    COPY_PLUGIN_AFTER_BUILD FALSE               # Should the plugin be installed to a default location after building?
     PLUGIN_MANUFACTURER_CODE Bosc               # A four-character manufacturer id with at least one upper-case character
     PLUGIN_CODE Augr                            # A unique four-character plugin id with at least one upper-case character
     FORMATS VST3 Standalone                     # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
@@ -63,7 +63,7 @@ juce_add_plugin(AugerPlugin
 # include all your JUCE module headers; if you're happy to include module headers directly, you
 # probably don't need to call this.
 
-# juce_generate_juce_header(AudioPluginExample)
+juce_generate_juce_header(AugerPlugin)
 
 # `target_sources` adds source files to a target. We pass the target that needs the sources as the
 # first argument, then a visibility parameter for the sources (PRIVATE is normally best practice,
@@ -73,7 +73,13 @@ juce_add_plugin(AugerPlugin
 target_sources(AugerPlugin PRIVATE
         src/PluginEditor.cpp
         src/PluginProcessor.cpp
-        src/CircularBuffer.h)
+        src/CircularBuffer.h
+        src/BlockSizeAdapter.h
+        src/BlockSizeAdapter.cpp
+        src/utilities.cpp
+        src/utilities.h
+        src/Win95LookAndFeel.cpp
+        src/Win95LookAndFeel.h)
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use
@@ -112,5 +118,11 @@ target_link_libraries(AugerPlugin PRIVATE
 set_property(TARGET AugerPlugin PROPERTY CXX_STANDARD 20)
 
 # Unit Test!
-add_executable(unit_tests test/tests.cpp src/CircularBuffer.h src/BlockSizeAdapter.cpp src/BlockSizeAdapter.h)
+add_executable(unit_tests test/tests.cpp src/CircularBuffer.h src/BlockSizeAdapter.cpp src/BlockSizeAdapter.h src/utilities.cpp src/utilities.h)
 set_property(TARGET unit_tests PROPERTY CXX_STANDARD 20)
+
+# Enable debug features
+if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    message("DEBUG features enabled")
+    add_compile_definitions(AUGER_DEBUG)
+endif()

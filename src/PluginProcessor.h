@@ -1,9 +1,12 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <opus.h>
+#include "BlockSizeAdapter.h"
+#define PACKET_SIZE 1024
 
 //==============================================================================
-class AudioPluginAudioProcessor  : public juce::AudioProcessor
+class AudioPluginAudioProcessor  : public juce::AudioProcessor, public BlockSizeAdapter::AdapterProcessor, public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     //==============================================================================
@@ -41,7 +44,26 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    //==============================================================================
+    void processChunk(std::span<float> chunk) override;
+    void parameterChanged(const juce::String& parameterID, float newValue) override;
+
+    //==============================================================================
+    void attachSlider(const juce::String& parameterId, juce::Slider& slider);
+    void unattachAllSliders();
+
 private:
+    // Processors ==================================================================
+
+    BlockSizeAdapter _blockSizeAdapter;
+    std::vector<float> _interlacedBuffer;
+    OpusEncoder* _encoder = nullptr;
+    OpusDecoder* _decoder = nullptr;
+
+    // Parameters ==================================================================
+    juce::AudioProcessorValueTreeState _parameters;
+    std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> _sliderAttachments;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };
