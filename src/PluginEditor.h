@@ -25,6 +25,7 @@ private:
     //==============================================================================
     juce::Slider bitrateSlider;
     juce::Slider dryWetSlider;
+    juce::ComboBox modeBox;
 
     void sliderValueChanged(juce::Slider* slider) override;
 

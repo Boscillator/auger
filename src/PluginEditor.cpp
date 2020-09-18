@@ -18,7 +18,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
 {
-    processorRef.unattachAllSliders();
+    processorRef.unattachAllAttachements();
     bitrateSlider.removeListener(this);
     setLookAndFeel(nullptr);
 }
@@ -40,7 +40,10 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     drawSection(g, bitrateSlider.getTextFromValue(bitrateSlider.getValue()), 128, 128, 343, 58);
 
     // Create Dry/Wet border
-    drawSection(g, "Dry/Wet", 300, 200, 172, 58);
+    drawSection(g, "Dry/Wet", 305, 200, 167, 58);
+
+    // Create mode border
+    drawSection(g, "Mode", 128, 200, 167, 58);
 
 }
 
@@ -59,6 +62,7 @@ void AudioPluginAudioProcessorEditor::resized()
 {
     bitrateSlider.setBounds(147, 141, 305, 40);
     dryWetSlider.setBounds(319, 220, 132, 40);
+    modeBox.setBounds(147, 213, 132, 40);
 }
 
 void AudioPluginAudioProcessorEditor::configureLookAndFeel() {
@@ -66,6 +70,7 @@ void AudioPluginAudioProcessorEditor::configureLookAndFeel() {
 }
 
 void AudioPluginAudioProcessorEditor::addComponents() {
+    // Bitrate slider
     bitrateSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     bitrateSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
     bitrateSlider.setTextValueSuffix(" BPS");
@@ -73,11 +78,20 @@ void AudioPluginAudioProcessorEditor::addComponents() {
     processorRef.attachSlider("bitrate", bitrateSlider);
     addAndMakeVisible(bitrateSlider);
 
+    // Dry/wet slider
     dryWetSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     dryWetSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
     dryWetSlider.addListener(this);
     processorRef.attachSlider("drywet", dryWetSlider);
     addAndMakeVisible(dryWetSlider);
+
+    // Mode box
+    modeBox.addItem("Natural", 1);
+    modeBox.addItem("Harsh", 2);
+    modeBox.addItem("Metallic", 3);
+    modeBox.setSelectedItemIndex(0);
+    processorRef.attachComboBox("mode", modeBox);
+    addAndMakeVisible(modeBox);
 }
 
 void AudioPluginAudioProcessorEditor::drawSection(juce::Graphics& g, const juce::String& label, int x, int y, int width,

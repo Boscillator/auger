@@ -51,7 +51,8 @@ public:
 
     //==============================================================================
     void attachSlider(const juce::String& parameterId, juce::Slider& slider);
-    void unattachAllSliders();
+    void attachComboBox(const juce::String& parameterId, juce::ComboBox& comboBox);
+    void unattachAllAttachements();
 
 private:
     //==============================================================================
@@ -70,6 +71,7 @@ private:
     // Parameters ==================================================================
     juce::AudioProcessorValueTreeState _parameters;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> _sliderAttachments;
+    std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>> _comboBoxAttachements;
 
     std::atomic<float>* _drywet = nullptr;
     std::atomic<bool> _useFilter = true;
