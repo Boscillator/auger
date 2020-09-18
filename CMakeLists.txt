@@ -63,7 +63,8 @@ juce_add_plugin(AugerPlugin
 # include all your JUCE module headers; if you're happy to include module headers directly, you
 # probably don't need to call this.
 
-juce_generate_juce_header(AugerPlugin)
+#juce_add_module(${CMAKE_CURRENT_LIST_DIR}/JUCE/modules/juce_dsp)
+# juce_generate_juce_header(AugerPlugin)
 
 # `target_sources` adds source files to a target. We pass the target that needs the sources as the
 # first argument, then a visibility parameter for the sources (PRIVATE is normally best practice,
@@ -113,6 +114,7 @@ target_compile_definitions(AugerPlugin
 target_link_libraries(AugerPlugin PRIVATE
     # AudioPluginData           # If we'd created a binary data target, we'd link to it here
     juce::juce_audio_utils
+    juce::juce_dsp
     opus)
 
 set_property(TARGET AugerPlugin PROPERTY CXX_STANDARD 20)

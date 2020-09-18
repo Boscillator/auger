@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_dsp/juce_dsp.h>
 #include <opus.h>
 #include "BlockSizeAdapter.h"
 #define PACKET_SIZE 1024
@@ -59,10 +60,13 @@ private:
     std::vector<float> _interlacedBuffer;
     OpusEncoder* _encoder = nullptr;
     OpusDecoder* _decoder = nullptr;
+    juce::dsp::DryWetMixer<float> _dryWetMixer;
 
     // Parameters ==================================================================
     juce::AudioProcessorValueTreeState _parameters;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> _sliderAttachments;
+
+    std::atomic<float>* _drywet = nullptr;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)

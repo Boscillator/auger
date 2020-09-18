@@ -21,9 +21,11 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
           _blockSizeAdapter(this, 2 * 480),
           _parameters(*this, nullptr, juce::Identifier("AugerPlugin"),
                       {
-                              std::make_unique<juce::AudioParameterInt>("bitrate", "BitRate", 8000, 40000, 16000)
+                              std::make_unique<juce::AudioParameterInt>("bitrate", "BitRate", 8000, 40000, 16000),
+                              std::make_unique<juce::AudioParameterFloat>("drywet", "Dry/Wet", 0.0f, 1.0f, 1.0f)
                       }) {
     _parameters.addParameterListener("bitrate", this);
+    _drywet = _parameters.getRawParameterValue("drywet");
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {
@@ -98,9 +100,15 @@ void AudioPluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
     _encoder = opus_encoder_create(48000, 2, OPUS_APPLICATION_VOIP, &err);
     _decoder = opus_decoder_create(48000, 2, &err);
 
-    // Set bitrate TODO: replace with parameters
+    // Set bitrate
     int bitrate = (int)*_parameters.getRawParameterValue("bitrate");
     opus_encoder_ctl(_encoder, OPUS_SET_BITRATE(bitrate));
+
+    // Configure dry/wet mixer
+    _dryWetMixer.setMixingRule(juce::dsp::DryWetMixingRule::balanced);
+    juce::dsp::ProcessSpec spec {sampleRate, static_cast<juce::uint32>(samplesPerBlock), 2};
+    _dryWetMixer.prepare(spec);
+    _dryWetMixer.setWetLatency(_blockSizeAdapter.getChunkSize());
 
 }
 
@@ -130,15 +138,24 @@ bool AudioPluginAudioProcessor::isBusesLayoutSupported(const BusesLayout& layout
 #endif
 }
 
+//==============================================================================
 void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
                                              juce::MidiBuffer& midiMessages) {
     juce::ignoreUnused(midiMessages);
 
     juce::ScopedNoDenormals noDenormals;
 
+    // Set up dry/wet mixer
+    _dryWetMixer.setWetMixProportion(*_drywet);
+    _dryWetMixer.pushDrySamples(buffer);
+
+    // Perform compression
     interlace(buffer.getNumSamples(), buffer.getReadPointer(0), buffer.getReadPointer(1), _interlacedBuffer.data());
     _blockSizeAdapter.process(_interlacedBuffer);
     deinterlace(buffer.getNumSamples(), buffer.getWritePointer(0), buffer.getWritePointer(1), _interlacedBuffer.data());
+
+    // Remix dry signal
+    _dryWetMixer.mixWetSamples(buffer);
 }
 
 //==============================================================================
@@ -147,8 +164,8 @@ bool AudioPluginAudioProcessor::hasEditor() const {
 }
 
 juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor() {
-    return new AudioPluginAudioProcessorEditor(*this);
-//    return new juce::GenericAudioProcessorEditor(this);
+//    return new AudioPluginAudioProcessorEditor(*this);
+    return new juce::GenericAudioProcessorEditor(this);
 }
 
 //==============================================================================
@@ -171,15 +188,15 @@ void AudioPluginAudioProcessor::setStateInformation(const void* data, int sizeIn
             _parameters.replaceState(juce::ValueTree::fromXml(*xmlState));
 }
 
+//==============================================================================
 void AudioPluginAudioProcessor::processChunk(std::span<float> chunk) {
     // Encode and decode packet
     unsigned char data[PACKET_SIZE];
     size_t bytes = opus_encode_float(_encoder, chunk.data(), chunk.size() / 2, data, PACKET_SIZE);
     opus_decode_float(_decoder, data, bytes, chunk.data(), chunk.size() / 2, 0);
-
-//    std::this_thread::sleep_for(std::chrono::microseconds(100));
 }
 
+//==============================================================================
 void AudioPluginAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue) {
     if(_encoder == nullptr) return;
     if(parameterID == "bitrate") {
