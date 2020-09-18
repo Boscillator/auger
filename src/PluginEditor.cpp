@@ -39,6 +39,9 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     // Create boarder for slider
     drawSection(g, bitrateSlider.getTextFromValue(bitrateSlider.getValue()), 128, 128, 343, 58);
 
+    // Create Dry/Wet border
+    drawSection(g, "Dry/Wet", 300, 200, 172, 58);
+
 }
 
 void AudioPluginAudioProcessorEditor::drawWin95Window(juce::Graphics& g) const {
@@ -55,6 +58,7 @@ void AudioPluginAudioProcessorEditor::drawWin95Window(juce::Graphics& g) const {
 void AudioPluginAudioProcessorEditor::resized()
 {
     bitrateSlider.setBounds(147, 141, 305, 40);
+    dryWetSlider.setBounds(319, 220, 132, 40);
 }
 
 void AudioPluginAudioProcessorEditor::configureLookAndFeel() {
@@ -68,6 +72,12 @@ void AudioPluginAudioProcessorEditor::addComponents() {
     bitrateSlider.addListener(this);
     processorRef.attachSlider("bitrate", bitrateSlider);
     addAndMakeVisible(bitrateSlider);
+
+    dryWetSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    dryWetSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
+    dryWetSlider.addListener(this);
+    processorRef.attachSlider("drywet", dryWetSlider);
+    addAndMakeVisible(dryWetSlider);
 }
 
 void AudioPluginAudioProcessorEditor::drawSection(juce::Graphics& g, const juce::String& label, int x, int y, int width,
