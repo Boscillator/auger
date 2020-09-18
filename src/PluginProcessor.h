@@ -54,6 +54,9 @@ public:
     void unattachAllSliders();
 
 private:
+    //==============================================================================
+    void updateFrameSize(size_t size);
+
     // Processors ==================================================================
 
     BlockSizeAdapter _blockSizeAdapter;
@@ -61,12 +64,15 @@ private:
     OpusEncoder* _encoder = nullptr;
     OpusDecoder* _decoder = nullptr;
     juce::dsp::DryWetMixer<float> _dryWetMixer;
+    juce::IIRFilter _lowpassFilterLeft;
+    juce::IIRFilter _lowpassFilterRight;
 
     // Parameters ==================================================================
     juce::AudioProcessorValueTreeState _parameters;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> _sliderAttachments;
 
     std::atomic<float>* _drywet = nullptr;
+    std::atomic<bool> _useFilter = true;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
