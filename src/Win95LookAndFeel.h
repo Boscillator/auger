@@ -15,6 +15,10 @@ public:
     void drawComboBox(juce::Graphics& graphics, int width, int height, bool isButtonDown, int buttonX, int buttonY,
                       int buttonW, int buttonH, juce::ComboBox& box) override;
 
+    void drawPopupMenuBackground(juce::Graphics& graphics, int width, int height) override;
+
+    int getMenuWindowFlags() override;
+
 
 private:
     juce::Colour _colorLightBlue = juce::Colour::fromRGB(0,128, 129);

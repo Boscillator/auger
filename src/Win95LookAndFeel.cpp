@@ -8,6 +8,7 @@ Win95LookAndFeel::Win95LookAndFeel() {
     setColour(juce::ResizableWindow::backgroundColourId, _colorLightBlue);
     setColour(juce::Slider::trackColourId, _colorBlack);
     setColour(juce::ComboBox::textColourId, _colorBlack);
+    setColour(juce::PopupMenu::textColourId, _colorBlack);
 }
 
 void Win95LookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPos,
@@ -34,6 +35,10 @@ void Win95LookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int wid
     g.setColour(_colorLightGray);
     p = makeThumbPath(thumbX, y + 2);
     g.fillPath(p);
+}
+
+int Win95LookAndFeel::getMenuWindowFlags() {
+    return 0;
 }
 
 juce::Path Win95LookAndFeel::makeThumbPath(int x, int y) {
@@ -75,5 +80,12 @@ void Win95LookAndFeel::drawComboBox(juce::Graphics& graphics, int width, int hei
     p.addPolygon(juce::Point<float>(buttonX + buttonW/2,  buttonY + buttonH/2), 3, 4, juce::float_Pi);
     graphics.setColour(_colorBlack);
     graphics.fillPath(p);
+}
+
+void Win95LookAndFeel::drawPopupMenuBackground(juce::Graphics& graphics, int width, int height) {
+    graphics.setColour(_colorBlack);
+    graphics.fillRect(0,0,width,height);
+    graphics.setColour(_colorLightGray);
+    graphics.fillRect(0,0,width - 2, height - 2);
 }
 
