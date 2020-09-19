@@ -12,6 +12,8 @@ public:
 
     void drawLinearSlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float minSliderPos, float maxSliderPos, juce::Slider::SliderStyle style, juce::Slider& slider) override;
 
+    void drawComboBox(juce::Graphics& graphics, int width, int height, bool isButtonDown, int buttonX, int buttonY,
+                      int buttonW, int buttonH, juce::ComboBox& box) override;
 
 
 private:
@@ -22,6 +24,8 @@ private:
     juce::Colour _colorWhite = juce::Colour::fromRGB(0xFF, 0xFF, 0xFF);
 
     static juce::Path makeThumbPath(int x, int y) ;
+
+    const int _triangleOffset = 7;
 };
 
 

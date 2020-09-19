@@ -62,7 +62,7 @@ void AudioPluginAudioProcessorEditor::resized()
 {
     bitrateSlider.setBounds(147, 141, 305, 40);
     dryWetSlider.setBounds(319, 220, 132, 40);
-    modeBox.setBounds(147, 213, 132, 40);
+    modeBox.setBounds(147, 222, 132, 20);
 }
 
 void AudioPluginAudioProcessorEditor::configureLookAndFeel() {
