@@ -113,7 +113,7 @@ void AudioPluginAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
     _dryWetMixer.setMixingRule(juce::dsp::DryWetMixingRule::balanced);
     juce::dsp::ProcessSpec spec{sampleRate, static_cast<juce::uint32>(samplesPerBlock), 2};
     _dryWetMixer.prepare(spec);
-    _dryWetMixer.setWetLatency(_blockSizeAdapter.getChunkSize());
+//    _dryWetMixer.setWetLatency(_blockSizeAdapter.getChunkSize());
 
     // Configure filter
     _lowpassFilterLeft.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 8000, 0.1));
@@ -257,7 +257,7 @@ void AudioPluginAudioProcessor::unattachAllAttachements() {
 
 void AudioPluginAudioProcessor::updateFrameSize(size_t size) {
     _blockSizeAdapter.setChunkSize(2 * size);
-    _dryWetMixer.setWetLatency(size);
+//    _dryWetMixer.setWetLatency(size);
 }
 
 
