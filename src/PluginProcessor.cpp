@@ -216,7 +216,6 @@ void AudioPluginAudioProcessor::processChunk(std::span<float> chunk) {
 
 //==============================================================================
 void AudioPluginAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue) {
-    std::cout << parameterID << " updated to " << newValue << std::endl;
     if (_encoder == nullptr) return;
     else if (parameterID == "bitrate") {
         opus_encoder_ctl(_encoder, OPUS_SET_BITRATE((int) newValue));
