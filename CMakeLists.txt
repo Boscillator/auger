@@ -18,7 +18,7 @@ add_subdirectory(opus)
 # `project()` command. `project()` sets up some helpful variables that describe source/binary
 # directories, and the current project version. This is a standard CMake command.
 
-project(AUGER_PLUGIN VERSION 0.0.2)
+project(AUGER_PLUGIN VERSION 0.0.3)
 
 # If you've installed JUCE somehow (via a package manager, or directly using the CMake install
 # target), you'll need to tell this project that it depends on the installed copy of JUCE. If you've
@@ -45,12 +45,12 @@ juce_add_plugin(AugerPlugin
     # VERSION ...                               # Set this if the plugin version is different to the project version
     # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     # ICON_SMALL ...
-    # COMPANY_NAME ...                          # Specify the name of the plugin's author
-    # IS_SYNTH TRUE/FALSE                       # Is this a synth or an effect?
-    # NEEDS_MIDI_INPUT TRUE/FALSE               # Does the plugin need midi input?
-    # NEEDS_MIDI_OUTPUT TRUE/FALSE              # Does the plugin need midi output?
-    # IS_MIDI_EFFECT TRUE/FALSE                 # Is this plugin a MIDI effect?
-    # EDITOR_WANTS_KEYBOARD_FOCUS TRUE/FALSE    # Does the editor need keyboard focus?
+    COMPANY_NAME "Boscillator Audio"            # Specify the name of the plugin's author
+    IS_SYNTH FALSE                              # Is this a synth or an effect?
+    NEEDS_MIDI_INPUT FALSE                      # Does the plugin need midi input?
+    NEEDS_MIDI_OUTPUT FALSE                     # Does the plugin need midi output?
+    IS_MIDI_EFFECT FALSE                        # Is this plugin a MIDI effect?
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE           # Does the editor need keyboard focus?
     COPY_PLUGIN_AFTER_BUILD FALSE               # Should the plugin be installed to a default location after building?
     PLUGIN_MANUFACTURER_CODE Bosc               # A four-character manufacturer id with at least one upper-case character
     PLUGIN_CODE Augr                            # A unique four-character plugin id with at least one upper-case character
@@ -63,7 +63,8 @@ juce_add_plugin(AugerPlugin
 # include all your JUCE module headers; if you're happy to include module headers directly, you
 # probably don't need to call this.
 
-juce_generate_juce_header(AugerPlugin)
+#juce_add_module(${CMAKE_CURRENT_LIST_DIR}/JUCE/modules/juce_dsp)
+# juce_generate_juce_header(AugerPlugin)
 
 # `target_sources` adds source files to a target. We pass the target that needs the sources as the
 # first argument, then a visibility parameter for the sources (PRIVATE is normally best practice,
@@ -113,6 +114,7 @@ target_compile_definitions(AugerPlugin
 target_link_libraries(AugerPlugin PRIVATE
     # AudioPluginData           # If we'd created a binary data target, we'd link to it here
     juce::juce_audio_utils
+    juce::juce_dsp
     opus)
 
 set_property(TARGET AugerPlugin PROPERTY CXX_STANDARD 20)

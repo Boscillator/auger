@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_dsp/juce_dsp.h>
 #include <opus.h>
 #include "BlockSizeAdapter.h"
 #define PACKET_SIZE 1024
@@ -50,19 +51,30 @@ public:
 
     //==============================================================================
     void attachSlider(const juce::String& parameterId, juce::Slider& slider);
-    void unattachAllSliders();
+    void attachComboBox(const juce::String& parameterId, juce::ComboBox& comboBox);
+    void unattachAllAttachements();
 
 private:
+    //==============================================================================
+    void updateFrameSize(size_t size);
+
     // Processors ==================================================================
 
     BlockSizeAdapter _blockSizeAdapter;
     std::vector<float> _interlacedBuffer;
     OpusEncoder* _encoder = nullptr;
     OpusDecoder* _decoder = nullptr;
+    juce::dsp::DryWetMixer<float> _dryWetMixer;
+    juce::IIRFilter _lowpassFilterLeft;
+    juce::IIRFilter _lowpassFilterRight;
 
     // Parameters ==================================================================
     juce::AudioProcessorValueTreeState _parameters;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> _sliderAttachments;
+    std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>> _comboBoxAttachements;
+
+    std::atomic<float>* _drywet = nullptr;
+    std::atomic<bool> _useFilter = true;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)

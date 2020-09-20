@@ -18,7 +18,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
 {
-    processorRef.unattachAllSliders();
+    processorRef.unattachAllAttachements();
     bitrateSlider.removeListener(this);
     setLookAndFeel(nullptr);
 }
@@ -39,6 +39,12 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     // Create boarder for slider
     drawSection(g, bitrateSlider.getTextFromValue(bitrateSlider.getValue()), 128, 128, 343, 58);
 
+    // Create Dry/Wet border
+    drawSection(g, "Dry/Wet", 305, 200, 167, 58);
+
+    // Create mode border
+    drawSection(g, "Mode", 128, 200, 167, 58);
+
 }
 
 void AudioPluginAudioProcessorEditor::drawWin95Window(juce::Graphics& g) const {
@@ -55,6 +61,8 @@ void AudioPluginAudioProcessorEditor::drawWin95Window(juce::Graphics& g) const {
 void AudioPluginAudioProcessorEditor::resized()
 {
     bitrateSlider.setBounds(147, 141, 305, 40);
+    dryWetSlider.setBounds(319, 220, 132, 40);
+    modeBox.setBounds(147, 222, 132, 20);
 }
 
 void AudioPluginAudioProcessorEditor::configureLookAndFeel() {
@@ -62,12 +70,28 @@ void AudioPluginAudioProcessorEditor::configureLookAndFeel() {
 }
 
 void AudioPluginAudioProcessorEditor::addComponents() {
+    // Bitrate slider
     bitrateSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     bitrateSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
     bitrateSlider.setTextValueSuffix(" BPS");
     bitrateSlider.addListener(this);
     processorRef.attachSlider("bitrate", bitrateSlider);
     addAndMakeVisible(bitrateSlider);
+
+    // Dry/wet slider
+    dryWetSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    dryWetSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
+    dryWetSlider.addListener(this);
+    processorRef.attachSlider("drywet", dryWetSlider);
+    addAndMakeVisible(dryWetSlider);
+
+    // Mode box
+    modeBox.addItem("Natural", 1);
+    modeBox.addItem("Harsh", 2);
+    modeBox.addItem("Metallic", 3);
+    modeBox.setSelectedItemIndex(0);
+    processorRef.attachComboBox("mode", modeBox);
+    addAndMakeVisible(modeBox);
 }
 
 void AudioPluginAudioProcessorEditor::drawSection(juce::Graphics& g, const juce::String& label, int x, int y, int width,
