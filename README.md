@@ -7,6 +7,4 @@ hold music or a conference call.
 
 ## Media
 
-[Demo](https://raw.githubusercontent.com/Boscillator/auger/master/docs/demo.mp3)
-
 ![Screenshot of Auger](./docs/screenshot.png)
